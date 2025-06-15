@@ -1,6 +1,7 @@
-Flask
-tweepy
-requests
-schedule
-pytrends
-gunicorn
+tweepy==4.14.0
+requests==2.32.3
+schedule==1.2.2
+flask==3.0.3
+python-dotenv==1.0.1
+pytrends==4.9.2
+gunicorn==23.0.0
