@@ -1,0 +1,6 @@
+Flask
+tweepy
+requests
+schedule
+pytrends
+gunicorn
