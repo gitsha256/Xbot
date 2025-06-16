@@ -1,1 +1,1 @@
-web: gunicorn --config gunicorn.conf.py --workers 1 --timeout 300 app:app
+gunicorn --bind 0.0.0.0:8080 app:app
