@@ -4,6 +4,8 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Flask app initialized")
+
 @app.route('/')
 def index():
     print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Flask route accessed")
