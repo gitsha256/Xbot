@@ -2,6 +2,8 @@ import os
 from flask import Flask
 from datetime import datetime
 
+print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Module loaded")
+
 app = Flask(__name__)
 
 print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Flask app initialized")
