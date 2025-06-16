@@ -10,9 +10,6 @@ from flask import Flask
 from dotenv import load_dotenv
 from pytrends.request import TrendReq
 from datetime import datetime
-print("ENV VARS:", dict(os.environ))
-
-
 # --- Logging Setup ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger()
