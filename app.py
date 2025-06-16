@@ -33,8 +33,7 @@ def initialize_twitter_client():
             access_token=os.getenv("ACCESS_TOKEN"),
             access_token_secret=os.getenv("ACCESS_TOKEN_SECRET")
         )
-        username = client.get_me().data.username
-        print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Successfully authenticated as {username}")
+        print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Twitter client initialized")
         return client
     except Exception as e:
         print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Authentication failed: {e}")
