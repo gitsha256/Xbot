@@ -3,9 +3,6 @@ from flask import Flask
 from dotenv import load_dotenv
 from datetime import datetime
 import tweepy
-import schedule
-import time
-import threading
 
 app = Flask(__name__)
 
@@ -32,30 +29,10 @@ def initialize_twitter_client():
         )
         username = client.get_me().data.username
         print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Successfully authenticated as {username}")
-        return clientdering
+        return client  # Fixed typo: was 'clientdering'
     except Exception as e:
         print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Authentication failed: {e}")
         return None
-
-def post_tweets(client):
-    print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Posting test tweet...")
-    try:
-        client.create_tweet(text="Test tweet from Railway!")
-        print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Test tweet posted")
-    except Exception as e:
-        print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Failed to post test tweet: {e}")
-
-def run_schedule(client):
-    schedule.every(2).minutes.do(post_tweets, client=client)
-    print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Scheduler started, running every 2 minutes...")
-    post_tweets(client)  # Immediate test
-    while True:
-        try:
-            schedule.run_pending()
-            time.sleep(10)
-        except Exception as e:
-            print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Scheduler error: {e}")
-            time.sleep(60)
 
 @app.route('/')
 def index():
@@ -65,10 +42,6 @@ def index():
 if __name__ == "__main__":
     print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Starting minimal Flask app...")
     client = initialize_twitter_client()
-    if client:
-        scheduler_thread = threading.Thread(target=run_schedule, args=(client,), daemon=True)
-        scheduler_thread.start()
-        print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Scheduler thread started")
     port = int(os.environ.get("PORT", 8080))
     print(f"TEST [{datetime.now().strftime('%H:%M:%S')}]: Starting Flask server on port {port}...")
     app.run(host='0.0.0.0', port=port)
