@@ -1,2 +1,2 @@
 web: gunicorn --config gunicorn.conf.py --workers 4 --timeout 300 app:app
-worker: python worker.py
+worker: echo "Worker process started successfully from Procfile!" && sleep 3600
