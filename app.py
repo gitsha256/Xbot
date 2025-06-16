@@ -289,5 +289,3 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Starting Flask server on port {port} (local development)...")
     app.run(host='0.0.0.0', port=port)
-
-```
