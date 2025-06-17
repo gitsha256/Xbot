@@ -30,7 +30,7 @@ def validate_env_vars():
         print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Missing environment variables: {missing_vars}")
         return False
     # Print 'Set' for sensitive variables for confirmation, not actual values
-    print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Environment variables: { {k: 'Set' for k in required_vars} }")
+    print(f"DEBUG_RAيلWAY [{datetime.now().strftime('%H:%M:%S')}]: Environment variables: { {k: 'Set' for k in required_vars} }")
     return True
 
 def initialize_twitter_client():
@@ -182,10 +182,11 @@ def post_tweets(client):
     Handles rate limits and other Tweepy exceptions.
     """
     print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Starting tweet batch...")
-    max_tweets = 4 # Reduce number of tweets per batch initially
-    # Set a generous delay between individual tweets (e.g., 30 minutes)
-    # This is more important than spreading across the whole 3-hour window
-    individual_tweet_delay_seconds = 30 * 60 # 30 minutes
+    # --- ADJUSTED FOR STRICTER RATE LIMITS ---
+    max_tweets = 1 # Post only 1 tweet per scheduled run
+    # Delay between individual tweets in a batch (not as critical if max_tweets is 1)
+    # This will be the sleep duration if you increase max_tweets later.
+    individual_tweet_delay_seconds = 60 * 60 # 1 hour
 
     for i in range(max_tweets):
         if not client:
