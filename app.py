@@ -255,7 +255,7 @@ def run_schedule(client):
 try:
     print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Attempting early Twitter client initialization for preload_app.")
     GLOBAL_TWITTER_CLIENT = initialize_twitter_client()
-    if GLOBAL_TWILIGHT_CLIENT: # Typo corrected from GLOBAL_TWILIGHT_CLIENT
+    if GLOBAL_TWITTER_CLIENT
         print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Global Twitter client initialized successfully.")
     else:
         print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Global Twitter client initialization FAILED (returned None). Check Railway env vars or API keys.")
