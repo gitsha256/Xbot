@@ -3,9 +3,9 @@ from flask import Flask
 from dotenv import load_dotenv
 from datetime import datetime
 import tweepy
-import schedule
-import time
-import threading
+import schedule # Still imported for type hinting or if functions might be called elsewhere
+import time     # Still imported for type hinting or if functions might be called elsewhere
+import threading # Still imported for type hinting or if functions might be called elsewhere
 import requests
 import random
 from pytrends.request import TrendReq
@@ -182,38 +182,47 @@ def post_tweets(client):
     Handles rate limits and other Tweepy exceptions.
     """
     print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Starting tweet batch...")
-    max_tweets = 8 # Number of tweets in this batch
-    # Calculate delay to spread 8 tweets over 3 hours (10800 seconds)
-    delay = (3 * 60 * 60) / max_tweets if max_tweets > 0 else 0
-    if delay < 10: # Minimum delay to avoid hammering APIs
-        delay = 10
+    max_tweets = 4 # Reduce number of tweets per batch initially
+    # Set a generous delay between individual tweets (e.g., 30 minutes)
+    # This is more important than spreading across the whole 3-hour window
+    individual_tweet_delay_seconds = 30 * 60 # 30 minutes
 
     for i in range(max_tweets):
         if not client:
             print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Tweet {i+1}/{max_tweets} skipped: Twitter client not initialized.")
-            break # Exit if client is not available
+            break
 
         content = get_tweet_content()
         if content:
             try:
+                # Ensure the tweet is within limits before attempting to post
+                if len(content) > 280:
+                    print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Tweet content too long, truncating before posting.")
+                    content = content[:277] + "..." # Truncate and add ellipsis
+
                 client.create_tweet(text=content)
                 print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Tweet {i+1}/{max_tweets} posted: {content[:50]}...")
             except tweepy.errors.TooManyRequests as e:
                 print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Rate limit hit: {e}. Waiting 15 minutes before retrying.")
-                time.sleep(15 * 60) # Wait 15 minutes for rate limit reset
+                time.sleep(15 * 60 + 10) # Add a small buffer just in case
                 continue # Try the current tweet again
             except tweepy.TweepyException as e:
                 print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Failed to post tweet {i+1}/{max_tweets} (TweepyException): {e}. Waiting 60 seconds.")
-                time.sleep(60) # Wait 60 seconds for other Twitter API errors
-                continue # Try the current tweet again
+                time.sleep(60)
+                continue
             except Exception as e:
                 print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Unexpected error posting tweet {i+1}/{max_tweets}: {e}. Skipping tweet.")
-                pass # Just skip this tweet if an unknown error occurs
+                pass
+
         else:
             print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: No content generated for tweet {i+1}/{max_tweets}, skipping.")
 
-        if i < max_tweets - 1: # Don't sleep after the last tweet in the batch
-            time.sleep(delay)
+        # Always sleep after an attempt (whether successful or not, unless continued for rate limit)
+        # This ensures you respect the individual tweet delay.
+        if i < max_tweets - 1: # Don't sleep after the last tweet of the batch
+            print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Waiting {individual_tweet_delay_seconds/60} minutes before next tweet...")
+            time.sleep(individual_tweet_delay_seconds)
+
     print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Finished tweet batch.")
 
 
@@ -246,7 +255,7 @@ def run_schedule(client):
 try:
     print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Attempting early Twitter client initialization for preload_app.")
     GLOBAL_TWITTER_CLIENT = initialize_twitter_client()
-    if GLOBAL_TWITTER_CLIENT:
+    if GLOBAL_TWILIGHT_CLIENT: # Typo corrected from GLOBAL_TWILIGHT_CLIENT
         print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Global Twitter client initialized successfully.")
     else:
         print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Global Twitter client initialization FAILED (returned None). Check Railway env vars or API keys.")
@@ -289,3 +298,4 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     print(f"DEBUG_RAILWAY [{datetime.now().strftime('%H:%M:%S')}]: Starting Flask server on port {port} (local development)...")
     app.run(host='0.0.0.0', port=port)
+
